@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Stack;
 
 public class SLRParser {
@@ -31,21 +32,23 @@ public class SLRParser {
             {null,  "r8",  null,  "s8",  "s9",  null,  "r8",  null,  null,  null,  null,  null,  null,  null},
     };
 
-    private String[] inputTokens;
+    private ArrayList<String> inputTokens;
     private Stack<String> stack;
 
-    public SLRParser(String[] inputTokens) {
-        this.inputTokens = inputTokens;
+    public SLRParser() {
+        this.inputTokens = null;
         this.stack = new Stack<>();
         stack.push("0");
     }
 
-    public void parse() {
+    public void parse(ArrayList<String> inputToken) {
+
+        setInputTokens(inputToken);
         int tokenIndex = 0;
 
         while (true) {
             String currentState = stack.peek();
-            String currentToken = inputTokens[tokenIndex];
+            String currentToken = inputTokens.get(tokenIndex);
 
             String action = parsingTable[Integer.parseInt(currentState)][getTokenIndex(currentToken)];
 
@@ -78,12 +81,14 @@ public class SLRParser {
                 stack.push(newState);
             }
         }
+        clearStack();
     }
 
     private int getTokenIndex(String token) {
         // Define the mapping from token to column index in the parsing table
         // Modify this based on your actual token set
-        String[] tokens = {"(", ")", "*", "+", "-", "/", ";", "=", "i", "n", "$", "E", "P", "T"};
+        String[] tokens = {"PARENTESIS_IZQ", "PARENTESIS_DER", "MULTIPLICACION", "SUMA", "RESTA", "DIVISION",
+                "PUNTO_COMA", "ASIGNACION", "IDENTIFICADOR", "NUMERO", "$", "E", "P", "T"};
         for (int i = 0; i < tokens.length; i++) {
             if (tokens[i].equals(token)) {
                 return i;
@@ -117,10 +122,19 @@ public class SLRParser {
     private String getReducedSymbol(int productionRule) {
         // Define the left-hand side symbol of each production rule
         // Modify this based on your actual grammar
-        String[] reducedSymbols = {"P'", "P", "P", "E", "E", "E", "E", "E", "E", "T", "T", "T", "T"};
+        String[] reducedSymbols = {"P'", "P", "P", "E", "E", "E", "E", "E", "E", "T", "T", "T", "T", "T"};
         if (productionRule >= 0 && productionRule < reducedSymbols.length) {
             return reducedSymbols[productionRule];
         }
         return null; // Invalid rule
+    }
+
+    public void setInputTokens(ArrayList<String> inputTokens) {
+        this.inputTokens = inputTokens;
+    }
+
+    private void clearStack() {
+        this.stack.clear();
+        stack.push("0");
     }
 }
