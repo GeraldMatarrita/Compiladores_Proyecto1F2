@@ -1,8 +1,12 @@
+package Syntax;
+
+import Auxiliar.SyntaxException;
+
 import java.util.ArrayList;
 import java.util.Stack;
 
 public class SLRParser {
-    private String[][] parsingTable = {
+    private final String[][] parsingTable = {
         //     (      )      *      +      -      /      ;      =      i      n      $      E      P     T
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "2",   "3",   "4"},
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "7",   null,  "4"},
@@ -33,7 +37,7 @@ public class SLRParser {
     };
 
     private ArrayList<String> inputTokens;
-    private Stack<String> stack;
+    private final Stack<String> stack;
 
     public SLRParser() {
         this.inputTokens = null;
@@ -41,7 +45,7 @@ public class SLRParser {
         stack.push("0");
     }
 
-    public void parse(ArrayList<String> inputToken) {
+    public String parse(ArrayList<String> inputToken) throws SyntaxException {
 
         setInputTokens(inputToken);
         int tokenIndex = 0;
@@ -53,8 +57,8 @@ public class SLRParser {
             String action = parsingTable[Integer.parseInt(currentState)][getTokenIndex(currentToken)];
 
             if (action == null) {
-                System.out.println("Error: No action found for state " + currentState + " and token " + currentToken);
-                break;
+                clearStack();
+                throw new SyntaxException();
             }
 
             if (action.equals("acc")) {
@@ -82,6 +86,7 @@ public class SLRParser {
             }
         }
         clearStack();
+        return null;
     }
 
     private int getTokenIndex(String token) {
@@ -137,4 +142,64 @@ public class SLRParser {
         this.stack.clear();
         stack.push("0");
     }
+
+//    public String getExpectedToken(String currentState, String currentToken) {
+//
+//        int stateNumber = Integer.parseInt(currentState);
+//
+//        switch (stateNumber) {
+//            case 0:
+//                // En el estado 0, se espera un inicio de declaración (i.e., "i" o "n")
+//                return "Identificador o número";
+//            case 2:
+//                // En el estado 2, se espera un "="
+//                return "=";
+//            case 6:
+//                // En el estado 6, se espera un ";" (fin de declaración)
+//                return ";";
+//            case 7:
+//                // En el estado 7, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 8:
+//                // En el estado 8, se espera un inicio de expresión ("i", "n", o "(")
+//                return "i, n, o (";
+//            case 9:
+//                // En el estado 9, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 12:
+//                // En el estado 12, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 13:
+//                // En el estado 13, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 14:
+//                // En el estado 14, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 15:
+//                // En el estado 15, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 16:
+//                // En el estado 16, se espera un inicio de expresión ("i", "n", o "(")
+//                return "i, n, o (";
+//            case 17:
+//                // En el estado 17, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 18:
+//                // En el estado 18, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 19:
+//                // En el estado 19, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            case 21:
+//                // En el estado 21, se espera un inicio de expresión ("i", "n", o "(")
+//                return "i, n, o (";
+//            case 25:
+//                // En el estado 25, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
+//                return "+, -, *, /, ), o $";
+//            default:
+//                // Para otros estados, no podemos determinar un token específico esperado, así que devolvemos "token desconocido".
+//                return "token desconocido";
+//        }
+//
+//    }
 }
