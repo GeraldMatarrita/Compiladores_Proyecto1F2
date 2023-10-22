@@ -1,3 +1,5 @@
+package Auxiliar;
+
 import java.io.*;
 
 public class Writer {
