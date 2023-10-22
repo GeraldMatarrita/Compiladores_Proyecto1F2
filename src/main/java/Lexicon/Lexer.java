@@ -1,9 +1,13 @@
+package Lexicon;
+
+import Auxiliar.Pair;
+
 import java.util.*;
 
 /**
  * This class provides methods for tokenizing a text line and detecting lexical errors.
  */
-public class faseLexica {
+public class Lexer {
 
     // Token types
     public static final String TOKEN_ASSIGN = "ASIGNACION";
@@ -29,8 +33,10 @@ public class faseLexica {
     // Indicates if a lexical error has occurred.
     private static boolean lexError = false;
 
+    private static boolean lineBreak = false;
+
     // Stores detected lexical errors.
-    private static Map<Integer, String> errors = new HashMap<>();
+    private static Map<Integer, String> errors = new LinkedHashMap<>();
 
     /**
      * Tokenizes a text line and returns a map containing the found tokens.
@@ -38,8 +44,8 @@ public class faseLexica {
      * @param line The text line to tokenize.
      * @return A map containing the found tokens along with their types.
      */
-    public static Map<Integer, Pair<String, String>> tokenize(String line) {
-        Map<Integer, Pair<String, String>> tokens = new HashMap<>(); // Stores the found tokens.
+    public static Map<String, Pair<String, String>> tokenize(String line) {
+        Map<String, Pair<String, String>> tokens = new LinkedHashMap<>(); // Stores the found tokens.
         key = 0; // Reset the key for the token map.
 
         String code = ""; // Stores the code of the current token.
@@ -48,6 +54,10 @@ public class faseLexica {
 
         while (pos < line.length()) {
             char currentChar = line.charAt(pos);
+
+            if (pos + 1 == line.length()){
+                lineBreak = true;
+            }
 
             if (Character.isDigit(currentChar)) {
                 // If the current character is a digit, it's a number.
@@ -84,9 +94,11 @@ public class faseLexica {
 
             // Handle whitespace and line breaks
             if (Character.isWhitespace(currentChar) || currentChar == '\n' || currentChar == '\r') {
-                if (currentChar == '\n')
+                if (currentChar == '\n') {
                     // If the current character is a line break, increase the line number.
                     currentLine++;
+                    lineBreak = true;
+                }
 
                 // If the current token is not empty, check the code.
                 checkToken(code, tokens);
@@ -115,7 +127,7 @@ public class faseLexica {
      * @param code   The code of the token.
      * @param tokens The token map.
      */
-    private static void checkToken(String code, Map<Integer, Pair<String, String>> tokens) {
+    private static void checkToken(String code, Map<String, Pair<String, String>> tokens) {
 
         // It will store the token type and the token code.
         Pair<String, String> pair = new Pair<>();
@@ -159,8 +171,8 @@ public class faseLexica {
      * @param tokens The token map.
      * @param pair   The (token, type) pair to verify.
      */
-    private static void verifyPair(Map<Integer, Pair<String, String>> tokens, Pair<String, String> pair) {
-        for (Map.Entry<Integer, Pair<String, String>> entry : tokens.entrySet()) {
+    private static void verifyPair(Map<String, Pair<String, String>> tokens, Pair<String, String> pair) {
+        for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
             if (entry.getValue().equals(pair)) {
                 // If the pair already exists, get the key and break the loop.
                 pair = entry.getValue();
@@ -168,7 +180,12 @@ public class faseLexica {
             }
         }
         // Store the pair in the token map.
-        tokens.put(key++, pair);
+        if (lineBreak){
+            tokens.put(String.valueOf(key++) + "lb", pair);
+            lineBreak = false;
+        } else {
+            tokens.put(String.valueOf(key++), pair);
+        }
     }
 
     /**
