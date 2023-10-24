@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * This class provides methods for tokenizing a text line and detecting lexical errors.
  */
-public class Lexer {
+public class faseLexica {
 
     // Token types
     public static final String TOKEN_ASSIGN = "ASIGNACION";
@@ -36,7 +36,7 @@ public class Lexer {
     private static boolean lineBreak = false;
 
     // Stores detected lexical errors.
-    private static Map<Integer, String> errors = new LinkedHashMap<>();
+    private static final Map<Integer, String> errors = new LinkedHashMap<>();
 
     /**
      * Tokenizes a text line and returns a map containing the found tokens.
@@ -50,7 +50,7 @@ public class Lexer {
 
         String code = ""; // Stores the code of the current token.
         int pos = 0; // Indicates the current position in the line.
-        int i = 0; // Index for iterating through the code of the current token.
+        int i; // Index for iterating through the code of the current token.
 
         while (pos < line.length()) {
             char currentChar = line.charAt(pos);
@@ -88,6 +88,7 @@ public class Lexer {
                     // If the next character is a digit, it's a lexical error.
                     lexError = true;
                 }
+                if (code.length()>12) lexError = true;
                 pos++;
                 continue;
             }
@@ -96,7 +97,6 @@ public class Lexer {
             if (Character.isWhitespace(currentChar) || currentChar == '\n' || currentChar == '\r') {
                 if (currentChar == '\n') {
                     // If the current character is a line break, increase the line number.
-                    currentLine++;
                     lineBreak = true;
                 }
 
@@ -181,10 +181,11 @@ public class Lexer {
         }
         // Store the pair in the token map.
         if (lineBreak){
-            tokens.put(String.valueOf(key++) + "lb", pair);
+            tokens.put(key++ + "l" + currentLine + "lb", pair);
+            currentLine++;
             lineBreak = false;
         } else {
-            tokens.put(String.valueOf(key++), pair);
+            tokens.put(key++ + "l" + currentLine, pair);
         }
     }
 
@@ -195,10 +196,6 @@ public class Lexer {
      */
     public static Map<Integer, String> getErrors() {
         return errors;
-    }
-
-    public static void updateCurrentLine(){
-        currentLine++;
     }
 
 }
