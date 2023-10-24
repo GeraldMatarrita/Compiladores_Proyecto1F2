@@ -1,8 +1,9 @@
 package Auxiliar;
 
 public class Pair<T,T1> {
-    T key;
-    T1 value;
+
+    private T key;
+    private T1 value;
 
     public Pair(T key, T1 value) {
         this.key = key;
@@ -27,7 +28,6 @@ public class Pair<T,T1> {
     public void setValue(T1 value) {
         this.value = value;
     }
-
 
     @Override
     public boolean equals(Object obj) {
