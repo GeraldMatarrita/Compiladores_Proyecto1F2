@@ -1,12 +1,19 @@
 package Syntax;
 
+import Auxiliar.Pair;
 import Auxiliar.SyntaxException;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Stack;
 
-public class SLRParser {
-    private final String[][] parsingTable = {
+/**
+ * This class provides methods for parsing a list of tokens and detecting syntax errors.
+ */
+public class faseSintactica {
+
+    // Parsing table
+    private static final String[][] parsingTable = {
         //     (      )      *      +      -      /      ;      =      i      n      $      E      P     T
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "2",   "3",   "4"},
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "7",   null,  "4"},
@@ -36,64 +43,85 @@ public class SLRParser {
             {null,  "r8",  null,  "s8",  "s9",  null,  "r8",  null,  null,  null,  null,  null,  null,  null},
     };
 
-    private ArrayList<String> inputTokens;
-    private final Stack<String> stack;
+    private static final Stack<String> stack = new Stack<>(); // Stores the states and symbols
 
-    public SLRParser() {
-        this.inputTokens = null;
-        this.stack = new Stack<>();
-        stack.push("0");
-    }
 
-    public String parse(ArrayList<String> inputToken) throws SyntaxException {
+    /**
+     * Parses the given input tokens.
+     *
+     * @param inputToken The input tokens to parse.
+     * @throws SyntaxException If a syntax error is found.
+     */
+    public static void parse(ArrayList<String> inputToken) throws SyntaxException {
 
-        setInputTokens(inputToken);
-        int tokenIndex = 0;
+        // Stores the input tokens of the current line
+        int tokenIndex = 0; // Index for iterating through the input tokens
+        stack.push("0"); // Push the initial state to the stack
 
+        // Stop only when there is an error or the input is accepted
         while (true) {
-            String currentState = stack.peek();
-            String currentToken = inputTokens.get(tokenIndex);
+            String currentState = stack.peek();  // Get the current state
+            String currentToken = inputToken.get(tokenIndex);  // Get the current token
 
+            // Get the action from the parsing table
             String action = parsingTable[Integer.parseInt(currentState)][getTokenIndex(currentToken)];
 
+            // There is no action for the current state and token. It's a syntax error.
             if (action == null) {
                 clearStack();
                 throw new SyntaxException();
             }
 
             if (action.equals("acc")) {
-                System.out.println("Input is valid.");
+                // Accept action
                 break;
             } else if (action.charAt(0) == 's') {
                 // Shift action
+                // Get the next state
                 int nextState = Integer.parseInt(action.substring(1));
+                // Push the token and the next state to the stack
                 stack.push(currentToken);
                 stack.push(String.valueOf(nextState));
                 tokenIndex++;
             } else if (action.charAt(0) == 'r') {
                 // Reduce action
+                // Get the production rule
                 int productionRule = Integer.parseInt(action.substring(1));
+                // Get the length of the production rule
                 int reduceLength = getProductionLength(productionRule);
+
+                // Pop the symbols and states from the stack based on the length of the production rule
                 if (reduceLength > 0) {
                     for (int i = 0; i < 2 * reduceLength; i++) {
                         stack.pop();
                     }
                 }
+
+                // Get the reduced symbol
                 String reducedSymbol = getReducedSymbol(productionRule);
+                // Get the new state from the parsing table
                 String newState = parsingTable[Integer.parseInt(stack.peek())][getNonTerminalIndex(reducedSymbol)];
+
+                // Push the reduced symbol and the new state to the stack
                 stack.push(reducedSymbol);
                 stack.push(newState);
             }
         }
         clearStack();
-        return null;
     }
 
-    private int getTokenIndex(String token) {
+    /**
+     * Gets the index of the given token in the parsing table.
+     *
+     * @param token The token to get the index of.
+     * @return The index of the token in the parsing table.
+     */
+    private static int getTokenIndex(String token) {
         // Define the mapping from token to column index in the parsing table
-        // Modify this based on your actual token set
         String[] tokens = {"PARENTESIS_IZQ", "PARENTESIS_DER", "MULTIPLICACION", "SUMA", "RESTA", "DIVISION",
                 "PUNTO_COMA", "ASIGNACION", "IDENTIFICADOR", "NUMERO", "$", "E", "P", "T"};
+
+        // Iterate through the tokens to find the index of the given token
         for (int i = 0; i < tokens.length; i++) {
             if (tokens[i].equals(token)) {
                 return i;
@@ -102,10 +130,17 @@ public class SLRParser {
         return -1; // Token not found
     }
 
-    private int getNonTerminalIndex(String symbol) {
-        // Define the mapping from non-terminal symbol to column index in the parsing table
-        // Modify this based on your actual non-terminals
+    /**
+     * Gets the index of the given non-terminal symbol in the parsing table.
+     *
+     * @param symbol The non-terminal symbol to get the index of.
+     * @return The index of the non-terminal symbol in the parsing table.
+     */
+    private static int getNonTerminalIndex(String symbol) {
+        // Defines the mapping from non-terminal symbol to column index in the parsing table
         String[] nonTerminals = {"E", "P", "T"};
+
+        // Iterate through the non-terminal symbols to find the index of the given symbol
         for (int i = 0; i < nonTerminals.length; i++) {
             if (nonTerminals[i].equals(symbol)) {
                 return i + 11; // Shift the index by 11 to match the table layout
@@ -114,92 +149,85 @@ public class SLRParser {
         return -1; // Symbol not found
     }
 
-    private int getProductionLength(int productionRule) {
-        // Define the length of each production rule
-        // Modify this based on your actual grammar
+    /**
+     * Gets the length of the given production rule.
+     *
+     * @param productionRule The production rule to get the length of.
+     * @return The length of the production rule.
+     */
+    private static int getProductionLength(int productionRule) {
+        // Defines the length of each production rule
         int[] productionLengths = {0, 2, 2, 1, 3, 3, 3, 3, 3, 1, 1, 3, 3, 3};
+
+        // Get the length of the production rule
         if (productionRule >= 0 && productionRule < productionLengths.length) {
             return productionLengths[productionRule];
         }
         return 0; // Invalid rule
     }
 
-    private String getReducedSymbol(int productionRule) {
-        // Define the left-hand side symbol of each production rule
-        // Modify this based on your actual grammar
+    /**
+     * Gets the reduced symbol of the given production rule.
+     *
+     * @param productionRule The production rule to get the reduced symbol of.
+     * @return The reduced symbol of the production rule.
+     */
+    private static String getReducedSymbol(int productionRule) {
+        // Defines the left-hand side symbol of each production rule
         String[] reducedSymbols = {"P'", "P", "P", "E", "E", "E", "E", "E", "E", "T", "T", "T", "T", "T"};
+
+        // Get the reduced symbol
         if (productionRule >= 0 && productionRule < reducedSymbols.length) {
             return reducedSymbols[productionRule];
         }
         return null; // Invalid rule
     }
 
-    public void setInputTokens(ArrayList<String> inputTokens) {
-        this.inputTokens = inputTokens;
-    }
-
-    private void clearStack() {
-        this.stack.clear();
+    /**
+     * Clears the stack and pushes the initial state.
+     */
+    private static void clearStack() {
+        stack.clear();
         stack.push("0");
     }
 
-//    public String getExpectedToken(String currentState, String currentToken) {
-//
-//        int stateNumber = Integer.parseInt(currentState);
-//
-//        switch (stateNumber) {
-//            case 0:
-//                // En el estado 0, se espera un inicio de declaración (i.e., "i" o "n")
-//                return "Identificador o número";
-//            case 2:
-//                // En el estado 2, se espera un "="
-//                return "=";
-//            case 6:
-//                // En el estado 6, se espera un ";" (fin de declaración)
-//                return ";";
-//            case 7:
-//                // En el estado 7, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 8:
-//                // En el estado 8, se espera un inicio de expresión ("i", "n", o "(")
-//                return "i, n, o (";
-//            case 9:
-//                // En el estado 9, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 12:
-//                // En el estado 12, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 13:
-//                // En el estado 13, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 14:
-//                // En el estado 14, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 15:
-//                // En el estado 15, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 16:
-//                // En el estado 16, se espera un inicio de expresión ("i", "n", o "(")
-//                return "i, n, o (";
-//            case 17:
-//                // En el estado 17, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 18:
-//                // En el estado 18, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 19:
-//                // En el estado 19, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            case 21:
-//                // En el estado 21, se espera un inicio de expresión ("i", "n", o "(")
-//                return "i, n, o (";
-//            case 25:
-//                // En el estado 25, se espera un operador binario ("+", "-", "*", "/", ")", o "$")
-//                return "+, -, *, /, ), o $";
-//            default:
-//                // Para otros estados, no podemos determinar un token específico esperado, así que devolvemos "token desconocido".
-//                return "token desconocido";
-//        }
-//
-//    }
+    /**
+     * Parses the given tokens.
+     *
+     * @param tokens The tokens to parse.
+     * @return (True, Line number) if there is a syntax error, (False, Line number) otherwise.
+     */
+    public static Pair<Boolean, Integer> parseTokens(Map<String, Pair<String, String>> tokens) {
+
+        ArrayList<String> inputTokens = new ArrayList<>();  // Stores the input tokens
+        boolean thereIsError = false;  // Indicates if there is a syntax error
+        int lineNumber = 1;  // Stores the line number of the syntax error
+
+        // Iterate through the tokens
+        for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
+            try {
+                if (entry.getKey().contains("lb")) {
+                    // If the token is a line break, parse the input tokens
+                    // Add the last token of the line to the input tokens
+                    inputTokens.add(entry.getValue().getKey());
+                    // Add the end of line token to the input tokens
+                    inputTokens.add("$");
+
+                    // Parse the input tokens
+                    parse(inputTokens);
+
+                    // Clear the input tokens and increase the line number
+                    inputTokens.clear();
+                    lineNumber++;
+                } else {
+                    // If the token is not a line break, add it to the input tokens
+                    inputTokens.add(entry.getValue().getKey());
+                }
+            } catch (SyntaxException e) {
+                thereIsError = true;
+                break;
+            }
+        }
+        return new Pair<>(thereIsError, lineNumber);
+    }
 }
