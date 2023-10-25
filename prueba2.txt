@@ -1,0 +1,4 @@
+variable = 11 ;
+variable2 = a - 7 ;
+c = ( a + b ) / 1 * 2 ;
+d = c - variable2 ;
