@@ -2,6 +2,7 @@
 Analizador léxico y sintáctico
 
 Este analizador léxico y sintáctico se puede ejecutar por medio del .JAR en la carpeta comprimida de este proyecto.
+(Se necesita tener instalado Java 18 o superior, dado que el programa está compilador en esta versión).
 
 Para ser ejecutado es necesario descomprimir el .zip en una carpeta a gusto, 
 después abrir esa carpeta en el terminal o CMD y ejecutar el siguiente comando:
