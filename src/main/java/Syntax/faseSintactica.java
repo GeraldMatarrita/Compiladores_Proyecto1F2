@@ -117,68 +117,17 @@ public class faseSintactica {
      * @return The index of the token in the parsing table.
      */
     private static int getTokenIndex(String token) {
-        // Define the mapping from token to column index in the parsing table
-        /*String[] tokens = {"PARENTESIS_IZQ", "PARENTESIS_DER", "MULTIPLICACION", "SUMA", "RESTA", "DIVISION",
+
+        // Defines the mapping from token to column index in the parsing table
+        // Modify this based on your actual token set
+        String[] tokens = {"PARENTESIS_IZQ", "PARENTESIS_DER", "MULTIPLICACION", "SUMA", "RESTA", "DIVISION",
                 "PUNTO_COMA", "ASIGNACION", "IDENTIFICADOR", "NUMERO", "$", "E", "P", "T"};
 
         // Iterate through the tokens to find the index of the given token
         for (int i = 0; i < tokens.length; i++) {
-            if (tokens[i].equals(token)) {
-                return i;
-            }
+            if (tokens[i].equals(token)) return i;
         }
-        return -1; // Token not found*/
-
-        switch (token) {
-            case "PARENTESIS_IZQ" -> {
-                return 0;
-            }
-            case "PARENTESIS_DER" -> {
-                return 1;
-            }
-            case "MULTIPLICACION" -> {
-                return 2;
-            }
-            case "SUMA" -> {
-                return 3;
-            }
-            case "RESTA" -> {
-                return 4;
-            }
-            case "DIVISION" -> {
-                return 5;
-            }
-            case "PUTNO_COMA" -> {
-                return 6;
-            }
-            case "ASIGNACION" -> {
-                return 7;
-            }
-            case "IDENTIFICADOR" -> {
-                return 8;
-            }
-            case "NUMERO" -> {
-                return 9;
-            }
-            case "$" -> {
-                return 10;
-            }
-            case "E" -> {
-                return 11;
-            }
-            case "P" -> {
-                return 12;
-            }
-            case "T" -> {
-                return 13;
-            }
-            // If the token is not an operator
-            default -> {
-                return -1;
-            }
-        }
-
-
+        return -1; // Token not found
     }
 
     /**
