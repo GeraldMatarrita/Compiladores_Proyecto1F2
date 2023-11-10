@@ -2,6 +2,7 @@ package Syntax;
 
 import Auxiliar.Pair;
 import Auxiliar.SyntaxException;
+import Semantic.faseSemantica;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Stack;
  * This class provides methods for parsing a list of tokens and detecting syntax errors.
  */
 public class faseSintactica {
-
+    faseSemantica treeAST;
     // Parsing table
     private static final String[][] parsingTable = {
         //     (      )      *      +      -      /      ;      =      i      n      $      E      P     T
@@ -91,8 +92,9 @@ public class faseSintactica {
                 int reduceLength = getProductionLength(productionRule);
 
                 // Pop the symbols and states from the stack based on the length of the production rule
-                if (reduceLength > 0) {
+                 if (reduceLength > 0) {
                     for (int i = 0; i < 2 * reduceLength; i++) {
+                        stack.lastElement();
                         stack.pop();
                     }
                 }

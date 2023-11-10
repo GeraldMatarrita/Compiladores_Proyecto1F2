@@ -9,14 +9,15 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         // Error message if the number of arguments is incorrect
-        if (args.length != 2) {
-            System.out.println("Uso incorrecto. Debes proporcionar un archivo de entrada y el nombre del archivo de salida.");
-            return;
-        }
 
-        String inputFileName = args[0]; // The input is taken from the first argument
-        String outputFileName = args[1]; // The name of the output file is taken from the second argument
-
+//        if (args.length != 2) {
+//            System.out.println("Uso incorrecto. Debes proporcionar un archivo de entrada y el nombre del archivo de salida.");
+//            return;
+//        }
+//
+//        String inputFileName = args[0]; // The input is taken from the first argument
+        String outputFileName = "/Users/emmanuellopezramirez/Desktop/Compiladores/Avance 3/output.txt"; // The name of the output file is taken from the second argument
+        String inputFileName = "/Users/emmanuellopezramirez/Desktop/Compiladores/Avance 3/prueba4.txt";
         // Read the input file
         String text = Auxiliar.Writer.getText(inputFileName);
 
