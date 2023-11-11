@@ -1,0 +1,1 @@
+Error [Fase Sintáctica]: La línea 1 contiene un error en su gramática

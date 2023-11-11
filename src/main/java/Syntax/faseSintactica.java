@@ -2,9 +2,13 @@ package Syntax;
 
 import Auxiliar.Pair;
 import Auxiliar.SyntaxException;
+import Semantic.ASTNodeBuilder;
+import Semantic.ASTNode;
+import Semantic.AST;
 import Semantic.faseSemantica;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -44,8 +48,11 @@ public class faseSintactica {
             {null,  "r8",  null,  "s8",  "s9",  null,  "r8",  null,  null,  null,  null,  null,  null,  null},
     };
 
+    private static AST tree = new AST(); // Stores the AST
+
     private static final Stack<String> stack = new Stack<>(); // Stores the states and symbols
 
+    private static final Stack<ASTNode> treeStack = new Stack<>(); // Stores the nodes of the AST
 
     /**
      * Parses the given input tokens.
@@ -92,15 +99,32 @@ public class faseSintactica {
                 int reduceLength = getProductionLength(productionRule);
 
                 // Pop the symbols and states from the stack based on the length of the production rule
-                 if (reduceLength > 0) {
+                ArrayList<ASTNode> childrenASTNodes = new ArrayList<>();
+                if (reduceLength > 0) {
                     for (int i = 0; i < 2 * reduceLength; i++) {
-                        stack.lastElement();
-                        stack.pop();
+                        String popValue = stack.pop();
+                        if (i % 2 != 0) {
+                            switch (popValue) {
+                                case "E", "P", "T" -> {
+                                    ASTNode ASTNode = treeStack.pop();
+                                    childrenASTNodes.add(ASTNode);
+                                }
+                                default -> {
+                                    ASTNode ASTNode = ASTNodeBuilder.buildTerminal(popValue);
+                                    childrenASTNodes.add(ASTNode);
+                                }
+                            }
+                        }
                     }
                 }
 
                 // Get the reduced symbol
                 String reducedSymbol = getReducedSymbol(productionRule);
+
+                ASTNode reducedASTNode = ASTNodeBuilder.buildReducedNode(reducedSymbol, childrenASTNodes);
+                
+                treeStack.push(reducedASTNode);
+
                 // Get the new state from the parsing table
                 String newState = parsingTable[Integer.parseInt(stack.peek())][getNonTerminalIndex(reducedSymbol)];
 
