@@ -1,9 +1,14 @@
+import Auxiliar.SyntaxException;
 import Auxiliar.Writer;
 import Lexicon.faseLexica;
 import Auxiliar.Pair;
+import Semantic.AST;
+import Semantic.ASTNode;
 import Syntax.faseSintactica;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class Main {
@@ -30,7 +35,7 @@ public class Main {
         Writer.writeTokens(tokens, outputFileName);
 
         // If there are lexical errors, stop the program
-        if (lexErrors.size() > 0) {
+        if (!lexErrors.isEmpty()) {
             // Write the errors to the error file
             Writer.writeLexErrors(lexErrors);
 
@@ -39,17 +44,22 @@ public class Main {
             return;
         }
 
-        // Parse the tokens and get true if there is a syntax error and the line number
-        Pair<Boolean, Integer> syntaxError = faseSintactica.parseTokens(tokens);
+        ArrayList <String> tokensList = new ArrayList<String>();
+        for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
+            tokensList.add(entry.getValue().getKey());
+        }
+        tokensList.add("$");
 
-        // Map for updating the symbol table
+
         Map<String, Pair<String, String>> newSymbolTable = new LinkedHashMap<>();
+        // Parse the tokens and get true if there is a syntax error and the line number
+        try {
+            faseSintactica.parse(tokensList);
+        } catch (SyntaxException e) {
+            Integer errorLineNumber = faseSintactica.getLineNumber();
 
-        // If there is a syntax error, the symbol table is created without the tokens of the line with the error
-        if (syntaxError.getKey()) {
-
-            // Write the syntax error to the error file
-            Writer.writeSyntaxError(syntaxError.getValue());
+            // Map for updating the symbol table
+            Writer.writeSyntaxError(errorLineNumber);
 
             // Message of syntax error
             System.err.println("Error [Fase Sintáctica]: El archivo contiene errores sintácticos. Revisa el archivo error.txt" +
@@ -57,19 +67,20 @@ public class Main {
 
             // Create the symbol table without the tokens of the line with the error
             for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
-                if (!entry.getKey().contains("l" + syntaxError.getValue()))
+                if (!entry.getKey().contains("l" + errorLineNumber)) {
                     newSymbolTable.put(entry.getKey(), entry.getValue());
+                }
             }
-        } else {
-            // Create the symbol table with all the tokens
-            newSymbolTable = tokens;
+            System.exit(0);
         }
+
+        AST tree = faseSintactica.getTree();
 
         // Write the tokens to the output file
         outputFileName = "tablaDeSimbolos.txt";
         Writer.writeTokens(newSymbolTable, outputFileName);
 
         // Message of success
-        if (!syntaxError.getKey()) System.out.println("Input is valid.");
+        System.out.println("Input is valid.");
     }
 }

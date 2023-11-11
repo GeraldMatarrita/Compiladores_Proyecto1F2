@@ -30,16 +30,17 @@ public class faseSintactica {
             {null,  "s17", null,  "s8",  "s9",  null,  null,  null,  null,  null,  null,  null,  null,  null},
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "18",  null,  "4"},
             {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "19",  null,  "4"},
-            {null,  null,  null,  null,  null,  null,  "r1",  null,  null,  null,  "r1",  null,  null,  null},
+            {"s1",  null,  null,  null,  null,  null,  "r1",  null,  "s5",  "s6",  "r1",  "2",   "20",  "4"},
             {null,  null,  null,  null,  null,  null,  "r2",  null,  null,  null,  "r2",  null,  null,  null},
-            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s21", "s6",  null,  null,  "20",  "20"},
-            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s21", "s6",  null,  null,  "22",  "22"},
-            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s21", "s6",  null,  null,  "23",  "23"},
-            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s21", "s6",  null,  null,  "24",  "24"},
-            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "25",  null,  "4"},
+            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s22", "s6",  null,  null,  null,  "21"},
+            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s22", "s6",  null,  null,  null,  "23"},
+            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s22", "s6",  null,  null,  null,  "24"},
+            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s22", "s6",  null,  null,  null,  "25"},
+            {"s1",  null,  null,  null,  null,  null,  null,  null,  "s5",  "s6",  null,  "26",  null,  "4"},
             {null,  "r11", "r11", "r11", "r11", "r11", "r11", null,  null,  null,  null,  null,  null,  null},
             {null,  "r4",  null,  "s8",  "s9",  null,  "r4",  null,  null,  null,  null,  null,  null,  null},
             {null,  "r5",  null,  "s8",  "s9",  null,  "r5",  null,  null,  null,  null,  null,  null,  null},
+            {null,  null,  null,  null,  null,  null,  "s11", null,  null,   null, "r14", null,  null,  null},
             {null,  "r12", "s12", "r12", "r12", "s15", "r12", null,  null,  null,  null,  null,  null,  null},
             {null,  "r9",  "r9",  "r9",  "r9",  "r9",  "r9",  null,  null,  null,  null,  null,  null,  null},
             {null,  "r6",  "s12", "r6",  "r6",  "s15", "r6",  null,  null,  null,  null,  null,  null,  null},
@@ -54,13 +55,15 @@ public class faseSintactica {
 
     private static final Stack<ASTNode> treeStack = new Stack<>(); // Stores the nodes of the AST
 
+    private static Integer lineNumber = 1; // Stores the line number of the syntax error
+
     /**
      * Parses the given input tokens.
      *
      * @param inputToken The input tokens to parse.
      * @throws SyntaxException If a syntax error is found.
      */
-    public static void parse(ArrayList<String> inputToken) throws SyntaxException {
+    public static Integer parse(ArrayList<String> inputToken) throws SyntaxException {
 
         // Stores the input tokens of the current line
         int tokenIndex = 0; // Index for iterating through the input tokens
@@ -88,9 +91,12 @@ public class faseSintactica {
                 // Get the next state
                 int nextState = Integer.parseInt(action.substring(1));
                 // Push the token and the next state to the stack
+                if (currentToken.equals("PUNTO_COMA")) lineNumber++;
                 stack.push(currentToken);
                 stack.push(String.valueOf(nextState));
-                tokenIndex++;
+                if (tokenIndex < inputToken.size() - 1) {
+                    tokenIndex++;
+                }
             } else if (action.charAt(0) == 'r') {
                 // Reduce action
                 // Get the production rule
@@ -107,11 +113,11 @@ public class faseSintactica {
                             switch (popValue) {
                                 case "E", "P", "T" -> {
                                     ASTNode ASTNode = treeStack.pop();
-                                    childrenASTNodes.add(ASTNode);
+                                    childrenASTNodes.add(0, ASTNode);
                                 }
                                 default -> {
                                     ASTNode ASTNode = ASTNodeBuilder.buildTerminal(popValue);
-                                    childrenASTNodes.add(ASTNode);
+                                    childrenASTNodes.add(0, ASTNode);
                                 }
                             }
                         }
@@ -133,7 +139,9 @@ public class faseSintactica {
                 stack.push(newState);
             }
         }
+        tree.setRoot(treeStack.pop());
         clearStack();
+        return lineNumber;
     }
 
     /**
@@ -183,7 +191,7 @@ public class faseSintactica {
      */
     private static int getProductionLength(int productionRule) {
         // Defines the length of each production rule
-        int[] productionLengths = {0, 2, 2, 1, 3, 3, 3, 3, 3, 1, 1, 3, 3, 3};
+        int[] productionLengths = {0, 2, 2, 1, 3, 3, 3, 3, 3, 1, 1, 3, 3, 3, 3};
 
         // Get the length of the production rule
         if (productionRule >= 0 && productionRule < productionLengths.length) {
@@ -200,7 +208,7 @@ public class faseSintactica {
      */
     private static String getReducedSymbol(int productionRule) {
         // Defines the left-hand side symbol of each production rule
-        String[] reducedSymbols = {"P'", "P", "P", "E", "E", "E", "E", "E", "E", "T", "T", "T", "T", "T"};
+        String[] reducedSymbols = {"P'", "P", "P", "E", "E", "E", "E", "E", "E", "T", "T", "T", "T", "T", "P"};
 
         // Get the reduced symbol
         if (productionRule >= 0 && productionRule < reducedSymbols.length) {
@@ -255,5 +263,13 @@ public class faseSintactica {
             }
         }
         return new Pair<>(thereIsError, lineNumber);
+    }
+
+    public static Integer getLineNumber() {
+        return lineNumber;
+    }
+
+    public static AST getTree() {
+        return tree;
     }
 }

@@ -6,7 +6,7 @@ Token: 1, Tipo: NUMERO
 Token: ;, Tipo: PUNTO_COMA
 Token: i, Tipo: IDENTIFICADOR
 Token: =, Tipo: ASIGNACION
-Token: n, Tipo: IDENTIFICADOR
+Token: 4, Tipo: NUMERO
 Token: +, Tipo: SUMA
 Token: x, Tipo: IDENTIFICADOR
 Token: ;, Tipo: PUNTO_COMA
