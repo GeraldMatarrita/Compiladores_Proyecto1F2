@@ -2,21 +2,18 @@ package Syntax;
 
 import Auxiliar.Pair;
 import Auxiliar.SyntaxException;
-import Semantic.ASTNodeBuilder;
-import Semantic.ASTNode;
 import Semantic.AST;
-import Semantic.faseSemantica;
+import Semantic.ASTNode;
+import Semantic.ASTNodeBuilder;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 /**
  * This class provides methods for parsing a list of tokens and detecting syntax errors.
  */
 public class faseSintactica {
-    faseSemantica treeAST;
+
     // Parsing table
     private static final String[][] parsingTable = {
         //     (      )      *      +      -      /      ;      =      i      n      $      E      P     T
@@ -49,7 +46,7 @@ public class faseSintactica {
             {null,  "r8",  null,  "s8",  "s9",  null,  "r8",  null,  null,  null,  null,  null,  null,  null},
     };
 
-    private static AST tree = new AST(); // Stores the AST
+    private static final AST tree = new AST(); // Stores the AST
 
     private static final Stack<String> stack = new Stack<>(); // Stores the states and symbols
 
@@ -63,7 +60,7 @@ public class faseSintactica {
      * @param inputToken The input tokens to parse.
      * @throws SyntaxException If a syntax error is found.
      */
-    public static Integer parse(ArrayList<String> inputToken) throws SyntaxException {
+    public static void parse(ArrayList<Pair<String, String>> inputToken) throws SyntaxException {
 
         // Stores the input tokens of the current line
         int tokenIndex = 0; // Index for iterating through the input tokens
@@ -72,10 +69,17 @@ public class faseSintactica {
         // Stop only when there is an error or the input is accepted
         while (true) {
             String currentState = stack.peek();  // Get the current state
-            String currentToken = inputToken.get(tokenIndex);  // Get the current token
+            String currentToken = inputToken.get(tokenIndex).getKey().equals("IDENTIFICADOR")? inputToken.get(tokenIndex).getValue():inputToken.get(tokenIndex).getKey();  // Get the current token
+
+            int currentTokenIndex;
+            if (inputToken.get(tokenIndex).getKey().equals("IDENTIFICADOR")) {
+                currentTokenIndex = getTokenIndex("IDENTIFICADOR");
+            } else {
+                currentTokenIndex = getTokenIndex(currentToken);
+            }
 
             // Get the action from the parsing table
-            String action = parsingTable[Integer.parseInt(currentState)][getTokenIndex(currentToken)];
+            String action = parsingTable[Integer.parseInt(currentState)][currentTokenIndex];
 
             // There is no action for the current state and token. It's a syntax error.
             if (action == null) {
@@ -97,6 +101,7 @@ public class faseSintactica {
                 if (tokenIndex < inputToken.size() - 1) {
                     tokenIndex++;
                 }
+
             } else if (action.charAt(0) == 'r') {
                 // Reduce action
                 // Get the production rule
@@ -115,8 +120,13 @@ public class faseSintactica {
                                     ASTNode ASTNode = treeStack.pop();
                                     childrenASTNodes.add(0, ASTNode);
                                 }
-                                default -> {
+                                case "PARENTESIS_IZQ", "PARENTESIS_DER", "MULTIPLICACION", "SUMA", "RESTA", "DIVISION",
+                                        "PUNTO_COMA", "ASIGNACION", "NUMERO", "$" -> {
                                     ASTNode ASTNode = ASTNodeBuilder.buildTerminal(popValue);
+                                    childrenASTNodes.add(0, ASTNode);
+                                }
+                                default -> {
+                                    ASTNode ASTNode = ASTNodeBuilder.buildIdentifier(popValue);
                                     childrenASTNodes.add(0, ASTNode);
                                 }
                             }
@@ -127,6 +137,7 @@ public class faseSintactica {
                 // Get the reduced symbol
                 String reducedSymbol = getReducedSymbol(productionRule);
 
+                assert reducedSymbol != null;
                 ASTNode reducedASTNode = ASTNodeBuilder.buildReducedNode(reducedSymbol, childrenASTNodes);
                 
                 treeStack.push(reducedASTNode);
@@ -141,7 +152,6 @@ public class faseSintactica {
         }
         tree.setRoot(treeStack.pop());
         clearStack();
-        return lineNumber;
     }
 
     /**
@@ -223,46 +233,6 @@ public class faseSintactica {
     private static void clearStack() {
         stack.clear();
         stack.push("0");
-    }
-
-    /**
-     * Parses the given tokens.
-     *
-     * @param tokens The tokens to parse.
-     * @return (True, Line number) if there is a syntax error, (False, Line number) otherwise.
-     */
-    public static Pair<Boolean, Integer> parseTokens(Map<String, Pair<String, String>> tokens) {
-
-        ArrayList<String> inputTokens = new ArrayList<>();  // Stores the input tokens
-        boolean thereIsError = false;  // Indicates if there is a syntax error
-        int lineNumber = 1;  // Stores the line number of the syntax error
-
-        // Iterate through the tokens
-        for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
-            try {
-                if (entry.getKey().contains("lb")) {
-                    // If the token is a line break, parse the input tokens
-                    // Add the last token of the line to the input tokens
-                    inputTokens.add(entry.getValue().getKey());
-                    // Add the end of line token to the input tokens
-                    inputTokens.add("$");
-
-                    // Parse the input tokens
-                    parse(inputTokens);
-
-                    // Clear the input tokens and increase the line number
-                    inputTokens.clear();
-                    lineNumber++;
-                } else {
-                    // If the token is not a line break, add it to the input tokens
-                    inputTokens.add(entry.getValue().getKey());
-                }
-            } catch (SyntaxException e) {
-                thereIsError = true;
-                break;
-            }
-        }
-        return new Pair<>(thereIsError, lineNumber);
     }
 
     public static Integer getLineNumber() {

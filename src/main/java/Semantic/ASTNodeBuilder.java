@@ -1,7 +1,6 @@
 package Semantic;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ASTNodeBuilder {
     public static ASTNode builderAST(String rule, ArrayList<ASTNode> children) {
@@ -26,6 +25,10 @@ public class ASTNodeBuilder {
 
     public static ASTNode buildTerminal(String value) {
         return new ASTNode(value);
+    }
+
+    public static ASTNode buildIdentifier(String value) {
+        return new IdenfierASTNode(value);
     }
 
     public static ASTNode buildReducedNode(String reducedSymbol, ArrayList<ASTNode> childrenASTNodes) {

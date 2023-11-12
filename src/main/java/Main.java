@@ -1,14 +1,14 @@
+import Auxiliar.Pair;
+import Auxiliar.SemanticException;
 import Auxiliar.SyntaxException;
 import Auxiliar.Writer;
 import Lexicon.faseLexica;
-import Auxiliar.Pair;
 import Semantic.AST;
-import Semantic.ASTNode;
+import Semantic.faseSemantica;
 import Syntax.faseSintactica;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 public class Main {
@@ -44,11 +44,11 @@ public class Main {
             return;
         }
 
-        ArrayList <String> tokensList = new ArrayList<String>();
+        ArrayList <Pair<String, String>> tokensList = new ArrayList<>();
         for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
-            tokensList.add(entry.getValue().getKey());
+            tokensList.add(new Pair<>(entry.getValue().getKey(), entry.getValue().getValue()));
         }
-        tokensList.add("$");
+        tokensList.add(new Pair<>("$", null));
 
 
         Map<String, Pair<String, String>> newSymbolTable = new LinkedHashMap<>();
@@ -67,14 +67,32 @@ public class Main {
 
             // Create the symbol table without the tokens of the line with the error
             for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
-                if (!entry.getKey().contains("l" + errorLineNumber)) {
+                if (!entry.getKey().contains("l" + errorLineNumber) || !entry.getValue().getValue().equals("IDENTIFICADOR")) {
                     newSymbolTable.put(entry.getKey(), entry.getValue());
                 }
             }
-            System.exit(0);
+            System.exit(1);
+        }
+
+        for (Map.Entry<String, Pair<String, String>> entry : tokens.entrySet()) {
+            if (entry.getValue().getKey().equals("IDENTIFICADOR")) {
+                newSymbolTable.put(entry.getKey(), entry.getValue());
+            }
         }
 
         AST tree = faseSintactica.getTree();
+
+        try {
+            faseSemantica.analyzeSemantics(tree.getRoot());
+        } catch (SemanticException e) {
+            Integer errorLineNumber = faseSemantica.getLineNumber();
+            String identifierName = e.toString();
+            Writer.writeSemanticError(errorLineNumber, identifierName);
+
+            System.err.println("Error [Fase Semántica]: El archivo contiene errores semánticos. Revisa el archivo error.txt");
+
+            System.exit(0);
+        }
 
         // Write the tokens to the output file
         outputFileName = "tablaDeSimbolos.txt";

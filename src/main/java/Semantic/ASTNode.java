@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ASTNode {
-    String value;
-    List<ASTNode> children;
+    private final String value;
+    private final List<ASTNode> children;
 
     public ASTNode(String valor) {
         this.value = valor;
@@ -14,5 +14,13 @@ public class ASTNode {
 
     public void addChildren(ASTNode ASTNode) {
         children.add(ASTNode);
+    }
+
+    public List<ASTNode> getChildren() {
+        return children;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

@@ -48,7 +48,7 @@ public class faseLexica {
         Map<String, Pair<String, String>> tokens = new LinkedHashMap<>(); // Stores the found tokens.
         key = 0; // Reset the key for the token map.
 
-        String code = ""; // Stores the code of the current token.
+        StringBuilder code = new StringBuilder(); // Stores the code of the current token.
         int pos = 0; // Indicates the current position in the line.
         int i; // Index for iterating through the code of the current token.
 
@@ -61,7 +61,7 @@ public class faseLexica {
 
             if (Character.isDigit(currentChar)) {
                 // If the current character is a digit, it's a number.
-                code = code.concat(String.valueOf(currentChar));
+                code = new StringBuilder(code.toString().concat(String.valueOf(currentChar)));
                 i = 0;
                 while (i < code.length() && Character.isDigit(currentChar)) {
                     currentChar = code.charAt(i);
@@ -77,7 +77,7 @@ public class faseLexica {
             }
             if (Character.isLetter(currentChar)) {
                 // If the current character is a letter, it's an identifier.
-                code = code + currentChar;
+                code.append(currentChar);
 
                 i = 0;
                 while (i < code.length() && Character.isLetter(currentChar)) {
@@ -101,15 +101,15 @@ public class faseLexica {
                 }
 
                 // If the current token is not empty, check the code.
-                checkToken(code, tokens);
+                checkToken(code.toString(), tokens);
 
                 // Reset the code and continue with the next character.
                 pos++;
-                code = "";
+                code = new StringBuilder();
                 continue;
             } else {
                 // If the current character is not a digit, letter, whitespace or line break, it's an operator.
-                code = code.concat(String.valueOf(currentChar));
+                code = new StringBuilder(code.toString().concat(String.valueOf(currentChar)));
             }
 
             if (pos == line.length()-1){

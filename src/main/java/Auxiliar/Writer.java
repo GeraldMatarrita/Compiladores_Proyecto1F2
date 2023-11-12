@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class Writer {
 
+    private static final String errorFileName = "error.txt";
+
     /**
      * Reads the text from the input file and returns it as a string.
      *
@@ -34,38 +36,6 @@ public class Writer {
         return sb.toString();
     }
 
-
-    /**
-     * Writes the lexical errors to the error file.
-     *
-     * @param lexErrors The lexical errors to write.
-     */
-    public static void writeLexErrors(Map<Integer, String> lexErrors) {
-
-        // Name of the error file
-        String errorFileName = "error.txt";
-
-        // Open the error file
-        try (FileOutputStream fosErrors = new FileOutputStream(errorFileName);
-             BufferedWriter errorWriter = new BufferedWriter(new OutputStreamWriter(fosErrors))) {
-
-            // Write the errors to the error file
-            for (Map.Entry<Integer, String> errorEntry : lexErrors.entrySet()) {
-
-                int errorLineNumber = errorEntry.getKey(); // The line number of the error
-                String errorToken = errorEntry.getValue(); // The token that caused the error
-
-                // Write the error to the error file with the format
-                // "Error [Fase Léxica]: La línea <line number> contiene un error, lexema no reconocido: <token>"
-                errorWriter.write("Error [Fase Léxica]: La línea " + errorLineNumber +
-                        " contiene un error, lexema no reconocido: " + errorToken);
-                errorWriter.newLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
      * Writes the tokens to the output file.
      *
@@ -93,14 +63,38 @@ public class Writer {
     }
 
     /**
+     * Writes the lexical errors to the error file.
+     *
+     * @param lexErrors The lexical errors to write.
+     */
+    public static void writeLexErrors(Map<Integer, String> lexErrors) {
+        // Open the error file
+        try (FileOutputStream fosErrors = new FileOutputStream(errorFileName);
+             BufferedWriter errorWriter = new BufferedWriter(new OutputStreamWriter(fosErrors))) {
+
+            // Write the errors to the error file
+            for (Map.Entry<Integer, String> errorEntry : lexErrors.entrySet()) {
+
+                int errorLineNumber = errorEntry.getKey(); // The line number of the error
+                String errorToken = errorEntry.getValue(); // The token that caused the error
+
+                // Write the error to the error file with the format
+                // "Error [Fase Léxica]: La línea <line number> contiene un error, lexema no reconocido: <token>"
+                errorWriter.write("Error [Fase Léxica]: La línea " + errorLineNumber +
+                        " contiene un error, lexema no reconocido: " + errorToken);
+                errorWriter.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Writes the syntax error to the error file.
      *
      * @param lineNumber The line number of the syntax error.
      */
     public static void writeSyntaxError(Integer lineNumber){
-
-        // Name of the error file
-        String errorFileName = "error.txt";
 
         // Open the error file
         try (FileOutputStream fosErrors = new FileOutputStream(errorFileName);
@@ -110,6 +104,18 @@ public class Writer {
             // "Error [Fase Sintáctica]: La línea <line number> contiene un error sintáctico"
             errorWriter.write("Error [Fase Sintáctica]: La línea " + lineNumber + " contiene un error en su gramática");
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeSemanticError(Integer lineNumber, String identifierName){
+        try (FileOutputStream fosErrors = new FileOutputStream(errorFileName);
+             BufferedWriter errorWriter = new BufferedWriter(new OutputStreamWriter(fosErrors))) {
+
+            // Write the error to the error file with the format
+            // "Error [Fase Semántica]: La línea <line number> contiene un error, no declarado identificador <identifier name>"
+            errorWriter.write("Error [Fase Semántica]: La línea " + lineNumber + " contiene un error, no declarado identificador " + identifierName);
+        }catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
