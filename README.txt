@@ -6,7 +6,8 @@ Emmanuel López 2018077125
 
 Analizador léxico y sintáctico
 
-Este analizador léxico y sintáctico se puede ejecutar por medio del .JAR en la carpeta comprimida de este proyecto.
+Este analizador léxico, sintáctico y semántico se puede ejecutar por medio del .JAR en la carpeta
+comprimida de este proyecto.
 (Se necesita tener instalado Java 18 o superior, dado que el programa está compilador en esta versión).
 
 Para ser ejecutado es necesario descomprimir el .zip en una carpeta a gusto, 
@@ -27,7 +28,11 @@ Si hay uno o más errores léxicos debe de salir el mensaje:
 Si no hay errores léxicos, pero hay un error sintáctico debe de salir el mensaje:
 -- "Error [Fase Sintáctica]: El archivo contiene errores sintácticos. Revisa el archivo error.txt"
 
-Por último, revise los archivos output.txt y error.txt en la carpeta para verificar si la lectura del archivo input es correcta.
+Si no hay errores léxicos ni sintácticos, pero hay un error semántico debe de salir el mensaje:
+-- "Error [Fase Semántica]: El archivo contiene errores semánticos. Revisa el archivo error.txt"
+
+Por último, revise los archivos output.txt, tablaDeSimbolos.txt y error.txt en la carpeta para verificar
+si la lectura del archivo input es correcta.
 
 
 Si desea ver el código en IntelliJ puede seleccionar la opción de abrir proyecto y seleccionar la carpeta llamada
