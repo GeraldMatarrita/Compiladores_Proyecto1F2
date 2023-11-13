@@ -1,4 +1,2 @@
 numero = 11 ;
-variable = a - 7 ;
-8 = ( a + b ) / 1 * 2 ;
-d = c - variable ;
+variable = a - letra ;

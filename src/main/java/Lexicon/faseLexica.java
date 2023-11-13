@@ -135,7 +135,7 @@ public class faseLexica {
         // Handle operators
         switch (code) {
             case "+" -> pair = new Pair<>(TOKEN_PLUS, "+");
-            case "-" -> pair = new Pair<>(TOKEN_MINUS, "-");
+            case "–", "-" -> pair = new Pair<>(TOKEN_MINUS, "–");
             case "*" -> pair = new Pair<>(TOKEN_MULTIPLY, "*");
             case "/" -> pair = new Pair<>(TOKEN_DIVIDE, "/");
             case "(" -> pair = new Pair<>(TOKEN_PARENTHESE_L, "(");

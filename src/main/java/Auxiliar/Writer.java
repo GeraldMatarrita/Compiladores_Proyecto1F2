@@ -119,4 +119,24 @@ public class Writer {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Writes the semantic symbol table to the output file.
+     *
+     * @param symbolTable The semantic symbol table to write.
+     * @param outputFileName The name of the output file.
+     */
+
+    public static void writeSemanticSymbolTable(Map<Integer, String> symbolTable, String outputFileName){
+        try(FileOutputStream fosErrors = new FileOutputStream(outputFileName);
+            BufferedWriter errorWriter = new BufferedWriter(new OutputStreamWriter(fosErrors))) {
+
+            for (Map.Entry<Integer, String> entry : symbolTable.entrySet()) {
+                errorWriter.write(entry.getKey() + " - " + "IDENTIFIER: " + entry.getValue());
+                errorWriter.newLine();
+            }
+    } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
