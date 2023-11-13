@@ -4,7 +4,7 @@ Jeaustin Obando 2020067573
 Gerald Matarrita 2020144486
 Emmanuel López 2018077125
 
-Analizador léxico y sintáctico
+Analizador léxico, sintáctico y semántico
 
 Este analizador léxico, sintáctico y semántico se puede ejecutar por medio del .JAR en la carpeta
 comprimida de este proyecto.
