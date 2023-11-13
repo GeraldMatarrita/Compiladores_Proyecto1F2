@@ -63,7 +63,7 @@ public class ASTNodeBuilder {
      * @return The node
      */
     public static ASTNode buildIdentifier(String value) {
-        return new IdenfierASTNode(value);
+        return new IdentifierASTNode(value);
     }
 
     /**

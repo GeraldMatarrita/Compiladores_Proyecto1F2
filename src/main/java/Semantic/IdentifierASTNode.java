@@ -1,7 +1,7 @@
 package Semantic;
 
 // This class represents an identifier node in the AST
-public class IdenfierASTNode extends ASTNode{
+public class IdentifierASTNode extends ASTNode{
 
     // The name of the identifier
     private final String name;
@@ -10,7 +10,7 @@ public class IdenfierASTNode extends ASTNode{
      * Constructor for the identifier node
      * @param name The name of the identifier
      */
-    public IdenfierASTNode(String name) {
+    public IdentifierASTNode(String name) {
         super("IDENTIFICADOR");
         this.name = name;
     }

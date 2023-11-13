@@ -42,7 +42,7 @@ public class faseSemantica {
                 // If the node is an identifier
                 if (node.getChildren().get(0).getValue().equals("IDENTIFICADOR")){
                     // Add the identifier to the symbol table
-                    IdenfierASTNode identifier = (IdenfierASTNode) node.getChildren().get(0);
+                    IdentifierASTNode identifier = (IdentifierASTNode) node.getChildren().get(0);
                     symbolTable.put(count++, identifier.getName());
                 }
 
@@ -68,7 +68,7 @@ public class faseSemantica {
             // If the node is an identifier
             case "IDENTIFICADOR" -> {
                 // If the identifier is not in the symbol table, throw an exception
-                IdenfierASTNode identifier = (IdenfierASTNode) node;
+                IdentifierASTNode identifier = (IdentifierASTNode) node;
                 if (!symbolTable.containsValue(identifier.getName())){
                     throw new SemanticException(identifier.getName());
                 }
